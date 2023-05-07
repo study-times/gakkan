@@ -207,9 +207,10 @@ var firebaseConfig = {
       weekago.setDate(weekago.getDate() - 7);
       var week = format(new Date(weekago));
       console.log(week);
+      var minuite = Number(udata.status.time)/60;
     db.ref('archive/'+day+'/'+auth.currentUser.uid).update({
         "name":auth.currentUser.displayName,
-        "time":udata.status.time,
+        "time":minuite,
     });
     db.ref('users/'+auth.currentUser.uid+'/status').update({
       "now":"stop",
