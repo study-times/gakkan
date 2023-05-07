@@ -3,7 +3,7 @@
     "short_name": "Gakkan",
     "start_url": "./learning.html",
     "display": "standalone",
-    "orientation": "portrait",
+    "orientation": "any",
     "background_color": "#fff",
     "theme_color": "#fff",
     "categories":"education",
