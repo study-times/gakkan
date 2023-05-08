@@ -14,11 +14,24 @@ var firebaseConfig = {
     const auth = firebase.auth();
     
     var resettime;
+
     setTimeout(() => {
+        if(!auth.currentUser){
+            setTimeout(() => {
+                if(!auth.currentUser){
+                location.href="./index.html";
+             }else{
+                index();
+             }
+        }, 500);
+         }else{
+            index();
+         }
+        }, 1000);
+
+
+    function index(){
      document.getElementById("runArea").remove();
-     if(!auth.currentUser){
-        location.href="./index.html";
-     }
         db.ref('users/'+auth.currentUser.uid).on('value', function (obj) {
             if(!obj.val()){
                 console.log("no obj")
@@ -44,7 +57,7 @@ var firebaseConfig = {
     time.textContent = `${h}:${m}:${s}`;
             }
     });
-    }, 1000);
+    }
     
             var rotate = localStorage.getItem('rotate');
             var check = document.getElementById('switch1').checked;

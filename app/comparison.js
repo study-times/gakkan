@@ -32,8 +32,19 @@ var firebaseConfig = {
     
     setTimeout(() => {
         if(!auth.currentUser){
-            location.href="./index.html";
+            setTimeout(() => {
+                if(!auth.currentUser){
+                location.href="./index.html";
+             }else{
+                index();
+             }
+        }, 500);
+         }else{
+            index();
          }
+        }, 1000);
+    
+    function index(){
         document.getElementById("runArea").remove();
         db.ref('users/'+auth.currentUser.uid).on('value', function (uda) {
             var udata = uda.val();
@@ -57,9 +68,7 @@ var firebaseConfig = {
             own(data);
             yes(data);
             })
-        }, 1000);
-    
-    
+    }
             function format(dt){
         var y = dt.getFullYear();
       var m = ('00' + (dt.getMonth()+1)).slice(-2);
