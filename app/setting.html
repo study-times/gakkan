@@ -48,6 +48,8 @@
             <option value="8" id="id-8">8:00</option>
             </select>
         <p>この時刻に学習時刻をリセットします。普段学習しない時刻に設定してください。</p>
+        <label for="username">ユーザー名</label><br>
+        <input id="username" type="text"><button type="button" onclick="rename()">変更</button><br>
         <a href="https://docs.google.com/forms/d/e/1FAIpQLScFaVmrQGO5Iv11uE7eJNZoxiJK8n8qaR3hiM9rdRS31M3chA/viewform?usp=sf_link">エラーの報告</a>
     </div>
     <script>
@@ -68,6 +70,7 @@ const auth = firebase.auth();
 let time = document.getElementById('time');
     setTimeout(() => {
 time.addEventListener('change', inputChange);
+document.getElementById('username').value=auth.currentUser.displayName;
 }, 1000);
 function inputChange(event){
     db.ref('users/'+auth.currentUser.uid).update({
@@ -77,6 +80,36 @@ function inputChange(event){
         alert('変更されました');
 }, 500);
     console.log(event.currentTarget.value);
+}
+
+function format(dt){
+        var y = dt.getFullYear();
+      var m = ('00' + (dt.getMonth()+1)).slice(-2);
+      var d = ('00' + dt.getDate()).slice(-2);
+      var format = y + '-' + m + '-' + d;
+      return format
+    }
+
+
+function rename(){
+    var name = document.getElementById('username').value;
+    var update = {displayName:name};
+    auth.currentUser.updateProfile(update)
+       db.ref('users/'+auth.currentUser.uid).update({
+            "name":name,
+        });
+        db.ref('archive/'+format(new Date())+'/'+auth.currentUser.uid).update({
+        "name":name,
+    });
+    var today = new Date();
+    today.setDate(today.getDate() - 1);
+    var yesterday = new Date(today);
+        db.ref('archive/'+format(yesterday)+'/'+auth.currentUser.uid).update({
+        "name":name,
+    });
+    setTimeout(() => {
+        alert('変更されました');
+}, 500);
 }
     </script>
 </body>
