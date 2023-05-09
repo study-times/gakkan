@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<title>HTML5 端末の向きチェック -Gakkan_testing</title>
+<style>
+html, body{
+  height: 100%;
+  margin: 0px;
+  -webkit-text-size-adjust: 100%;  /* Safari対策 */
+}
+#result{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  border: 1px solid gray;
+  font-size: 100%;
+}
+
+/* 横向き */
+#result.landscape{ background-color:lightblue; }
+
+/* 縦向き */
+#result.portrait{ background-color:lightsalmon; }
+</style>
+</head>
+<body>
+
+<!-- 結果表示 -->
+<div id="result"></div>
+
+<script>
+/**
+ * [Event] ロード完了 (onload)
+ */
+ window.onload = ()=>{
+  setResult();
+}
+
+/**
+ * [Event] 画面回転 (orientationchange)
+ */
+window.addEventListener("orientationchange", ()=>{
+  setResult();
+});
+
+
+/**
+ * 結果表示
+ */
+function setResult(){
+  const result = document.querySelector("#result");
+
+  // 角度を取得
+  const angle = getAngle();
+  if( angle.value === undefined ){
+    result.innerHTML = "端末の向きを取得することが出来ませんでした";
+    return(false);
+  }
+
+  // メッセージを表示
+  result.innerHTML =  "<ul>"
+                      +   `<li>端末の向きは「<strong>${angle.isPortrait? "縦向き":"横向き"}</strong>」です</li>`
+                      +   `<li>端末の角度は「<strong>${angle.value}</strong>」です</li>`
+                      +   `<li>解像度は「<strong>${window.screen.width}x${window.screen.height}</strong>」です</li>`
+                      + "</ul>";
+
+  // 縦向き
+  if( angle.isPortrait ) {
+    result.classList.remove("landscape");
+    result.classList.add("portrait");
+  }
+  // 横向き
+  else{
+    result.classList.remove("portrait");
+    result.classList.add("landscape");
+  }
+}
+
+/**
+ * 端末の方向を返却する
+ *
+ * @return {object}
+ */
+function getAngle(){
+  // 角度を取得
+  let angle = screen && screen.orientation && screen.orientation.angle;
+  if ( angle === undefined ) {
+    angle = window.orientation;    // iOS用
+  }
+
+  const isPortrait = (angle === 0);
+  return({
+          value: angle,           // 具体的な角度
+     isPortrait: isPortrait,      // 縦向き
+    isLandscape: ! isPortrait,    // 横向き
+  });
+}
+</script>
+</body>
+</html>
