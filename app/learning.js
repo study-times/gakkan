@@ -79,7 +79,8 @@ var firebaseConfig = {
                 center.style.cursor="pointer";
             }
     
-            if (navigator.userAgent.match(/iPhone|Android.+Mobile/)&&rotate=="true") {
+            if (navigator.userAgent.match(/iPhone|Android.+Mobile/)) {
+                if(rotate=="true"){
                 window.addEventListener("orientationchange", function() {
         var orientation = window.orientation;
         if (orientation === 0) {
@@ -88,6 +89,7 @@ var firebaseConfig = {
             start();
       }
     });
+}
       } else {
         center.setAttribute('onclick','start()');
         center.style.cursor="pointer";
