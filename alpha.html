@@ -121,7 +121,7 @@
     <link rel="icon" href="./gakkanicon.png" />
     <script>
         function comparison(){
-            alert('α版では使用できません');
+            location.href="./comparison.html"
         }
     </script>
 </head>
@@ -160,7 +160,7 @@
             center.style.cursor="pointer";
         }
 
-        if (navigator.userAgent.match(/iPhone|Android.+Mobile/)) {
+        if (navigator.userAgent.match(/iPhone|Android.+Mobile/)&&rotate=="true") {
             window.addEventListener("orientationchange", function() {
     var orientation = window.orientation;
     if (orientation === 0) {
