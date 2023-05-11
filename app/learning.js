@@ -195,11 +195,14 @@ var firebaseConfig = {
     var y = dt.getFullYear();
   var m = ('00' + (dt.getMonth()+1)).slice(-2);
   var d = ('00' + dt.getDate()).slice(-2);
-  var format = y + '-' + m + '-' + d;
-    db.ref('archive/'+format+'/'+auth.currentUser.uid).update({
+  var forma = y + '-' + m + '-' + d;
+  if(forma=='NaN-aN-aN'){
+  }else{
+    db.ref('archive/'+forma+'/'+auth.currentUser.uid).update({
         "name":auth.currentUser.displayName,
         "time":Number(rtime)/60
     })
+}
     }
 
 
@@ -223,16 +226,20 @@ var firebaseConfig = {
       var week = format(new Date(weekago));
       console.log(week);
       var minuite = Number(udata.status.time)/60;
+      if(day=='NaN-aN-aN'){
+      }else{
     db.ref('archive/'+day+'/'+auth.currentUser.uid).update({
         "name":auth.currentUser.displayName,
         "time":minuite,
     });
+}
     db.ref('users/'+auth.currentUser.uid+'/status').update({
       "now":"stop",
       "time": stopTime,
       "record":new Date()
   });
   db.ref('archive/'+week).remove();
+
     }
     
     function checkdate(){
