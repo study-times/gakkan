@@ -1,3 +1,5 @@
+/**---------------------------------------
+ * --------APIトークンなどの記述------------ */
 var firebaseConfig = {
 
     apiKey: "AIzaSyDZG5TL_cjWvPHl-Z50WYi5pavCeweShzo",
@@ -8,28 +10,42 @@ var firebaseConfig = {
     messagingSenderId: "882074972938"
     
     };
-    // Initialize FireBase
+    
+
+
+    /**-----------------------------------
+     * -------FireBaseのインストール--------*/
     firebase.initializeApp(firebaseConfig);
     var db=firebase.database();
     const auth = firebase.auth();
     
-    var resettime;
+    var resettime;/**学習時刻をリセットする時刻を定義 */
+    var rotate = localStorage.getItem('rotate');
+    var check = document.getElementById('switch1').checked;
+    var center = document.getElementById('center');
+    var setting = document.getElementById('back');
+    // 開始時間
+    let rtime;
+    // 停止時間
+    // タイムアウトID
+    let timeoutID;
 
-    setTimeout(() => {
-        if(!auth.currentUser){
-            setTimeout(() => {
-                if(!auth.currentUser){
-                location.href="./index.html";
-             }else{
+
+    //**Firebaseのリセットを行ってからユーザーを取得 */
+    var unsubscribe = firebase.auth().onAuthStateChanged((user) => {
+        if (user) {
+                //**認証が成功したら、index()を実行する */
                 index();
-             }
-        }, 500);
-         }else{
-            index();
-         }
-        }, 1000);
+        }else{
+            location.href="./index.html";
+        }
+        // 登録解除
+        unsubscribe();
+      });
 
 
+        /**-------------------------------
+         * ----------FirebaseRDBから初期値を取得 */
     function index(){
      document.getElementById("runArea").remove();
         db.ref('users/'+auth.currentUser.uid).on('value', function (obj) {
@@ -55,19 +71,16 @@ var firebaseConfig = {
     const m = String(min).padStart(2, '0');
     const s = String(sec).padStart(2, '0');
     time.textContent = `${h}:${m}:${s}`;
+    rtime = Number(currentTime);
             }
     });
     }
     
-            var rotate = localStorage.getItem('rotate');
-            var check = document.getElementById('switch1').checked;
-            var center = document.getElementById('center');
-            var setting = document.getElementById('back');
-            var resettime;
             
 
 
             console.log(rotate)
+            //**画面回転の可否を確認 */
           if(rotate=="true"){
             document.getElementById('switch1').checked=true;
                 center.style.cursor="not-allowed";
@@ -99,8 +112,9 @@ var firebaseConfig = {
       }
     
     
-    
+
             function routate(){
+                //**画面回転時スタート、ストップ動作 */
             var check = document.getElementById('switch1').checked;
                 if(check){
                     localStorage.setItem('rotate',"true");
@@ -114,6 +128,7 @@ var firebaseConfig = {
             }
     
             function start(){
+                //**スタート動作。カウントアップスタート、DB更新 */
             var check = document.getElementById('switch1').checked;
                 document.body.style.backgroundColor='#Ffa07a';
                 document.getElementById('status').innerText='学習中';
@@ -125,13 +140,21 @@ var firebaseConfig = {
                 }
                 
                 if(!checkdate()){
+                    //**最終の更新が今日であるかの確認を行い、最終更新が今日以前であった場合、タイマーをリセットする */
                     retimer();
                 }
-                saimer();
+                rtime = Number(udata.status.time);
+        db.ref('users/'+auth.currentUser.uid+'/status').update({
+            "time":rtime,
+            "now":new Date(),
+            "record":new Date()
+        });
+      displayTime();
             }
     
             
             function stop(){
+                //**ストップ動作。 カウントアップを停止し、DBに記録*/
             var check = document.getElementById('switch1').checked;
                 document.body.style.backgroundColor="lightgreen";
                 document.getElementById('status').innerText='休憩中';
@@ -144,30 +167,35 @@ var firebaseConfig = {
                 if(!check){
                     center.setAttribute('onclick','start()');
                 }
-                stimer();
+                clearTimeout(timeoutID);
+                db.ref('users/'+auth.currentUser.uid+'/status').update({
+                  "now":"stop",
+                  "time": rtime,
+                  "record":new Date()
+              });
+              var ago = new Date();
+              ago.setHours(ago.getHours() -Number(resettime));
+              var dt = new Date(ago);
+              var y = dt.getFullYear();
+            var m = ('00' + (dt.getMonth()+1)).slice(-2);
+            var d = ('00' + dt.getDate()).slice(-2);
+            var forma = y + '-' + m + '-' + d;
+            if(forma=='NaN-aN-aN'){
+            }else{
+                //**DB記録 */
+              db.ref('archive/'+forma+'/'+auth.currentUser.uid).update({
+                  "name":auth.currentUser.displayName,
+                  "time":Number(rtime)/60
+              })
+          }
             }
     
     
             const time = document.getElementById('time');
-    //https://tcd-theme.com/2022/06/javascript-stopwatch.html
-    // 開始時間
-    let rtime;
-    // 停止時間
-    // タイムアウトID
-    let timeoutID;
+            
     
-    // スタートボタンがクリックされたら時間を進める
-    function saimer(){
-        rtime = Number(udata.status.time);
-        db.ref('users/'+auth.currentUser.uid+'/status').update({
-            "time":rtime,
-            "now":new Date(),
-            "record":new Date()
-        });
-      displayTime();
-    }
     
-    // 時間を表示する関数
+    // カウントアップ
     function displayTime() {
       var currentTime = rtime;
       const hour = Math.floor(currentTime/3600);
@@ -181,32 +209,10 @@ var firebaseConfig = {
       timeoutID = setTimeout(displayTime, 1000);
     }
     
-    // ストップボタンがクリックされたら時間を止める
-    function stimer(){
-      clearTimeout(timeoutID);
-      db.ref('users/'+auth.currentUser.uid+'/status').update({
-        "now":"stop",
-        "time": rtime,
-        "record":new Date()
-    });
-    var ago = new Date();
-    ago.setHours(ago.getHours() -Number(resettime));
-    var dt = new Date(ago);
-    var y = dt.getFullYear();
-  var m = ('00' + (dt.getMonth()+1)).slice(-2);
-  var d = ('00' + dt.getDate()).slice(-2);
-  var forma = y + '-' + m + '-' + d;
-  if(forma=='NaN-aN-aN'){
-  }else{
-    db.ref('archive/'+forma+'/'+auth.currentUser.uid).update({
-        "name":auth.currentUser.displayName,
-        "time":Number(rtime)/60
-    })
-}
-    }
 
 
     function format(dt){
+        //**日付を定形にフォーマットする */
         var y = dt.getFullYear();
       var m = ('00' + (dt.getMonth()+1)).slice(-2);
       var d = ('00' + dt.getDate()).slice(-2);
@@ -216,6 +222,7 @@ var firebaseConfig = {
     
 
     function retimer(){
+        //**タイマーのリセット */
       time.textContent = '00:00:00';
       stopTime = 0;
       var date = new Date(udata.status.record);
@@ -243,6 +250,7 @@ var firebaseConfig = {
     }
     
     function checkdate(){
+        //**最終更新が今日であることの確認 */
         var recordDate = udata.status.record;
         var rec = new Date(recordDate);
     var ago = new Date();
@@ -258,4 +266,17 @@ var firebaseConfig = {
         return false;
     }
     
+    }
+
+    function comparison(){
+        //**比較ページ読み込み */
+        if(rtime == udata.status.time){
+            location.href="./comparison.html"
+        }else{
+            if(!rtime){
+                alert('一度スタートしてから押してください');
+            }else{
+                alert('もう一度押してください');
+            }
+        }
     }
