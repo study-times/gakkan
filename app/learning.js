@@ -1,36 +1,31 @@
-/**---------------------------------------
- * --------APIトークンなどの記述------------ */
-var firebaseConfig = {
-
-    apiKey: "AIzaSyDZG5TL_cjWvPHl-Z50WYi5pavCeweShzo",
-    authDomain: "gakusyuzikan-589f0.firebaseapp.com",
-    databaseURL: "https://gakusyuzikan-589f0-default-rtdb.firebaseio.com",
-    projectId: "gakusyuzikan-589f0",
-    storageBucket: "gakusyuzikan-589f0.appspot.com",
-    messagingSenderId: "882074972938"
     
-    };
-    
-
-
     /**-----------------------------------
      * -------FireBaseのインストール--------*/
     firebase.initializeApp(firebaseConfig);
     var db=firebase.database();
     const auth = firebase.auth();
     
-    var resettime;/**学習時刻をリセットする時刻を定義 */
+    var resettime;
     var rotate = localStorage.getItem('rotate');
-    var check = document.getElementById('switch1').checked;
-    var center = document.getElementById('center');
-    var setting = document.getElementById('back');
-    // 開始時間
-    let rtime;
-    // 停止時間
-    // タイムアウトID
-    let timeoutID;
+            var check = document.getElementById('switch1').checked;
+            var center = document.getElementById('center');
+            var setting = document.getElementById('back');
+            var resettime;
+            const showTime = document.getElementById('time');
+    //https://tcd-theme.com/2022/06/javascript-stopwatch.html
 
 
+    var RDB_STATUS_TIME;// RDB用一時保存用記録時間
+    var RDB_STATUS_RECORD;// RDB用最終更新時刻
+    var RDB_STATUS_NOW;// RDB用現状表示
+    var RDB_ARCHIVE_TIME;//RDBアーカイブ用記録時間
+    
+    var timer;              // setinterval, clearTimeoutで使用
+    var startTime;          // 開始時間
+    var elapsedTime = 0;    // 経過時間
+    var holdTime;       // 一時停止用に時間を保持
+    
+    
     //**Firebaseのリセットを行ってからユーザーを取得 */
     var unsubscribe = firebase.auth().onAuthStateChanged((user) => {
         if (user) {
@@ -43,7 +38,7 @@ var firebaseConfig = {
         unsubscribe();
       });
 
-
+      
         /**-------------------------------
          * ----------FirebaseRDBから初期値を取得 */
     function index(){
@@ -71,27 +66,12 @@ var firebaseConfig = {
     const m = String(min).padStart(2, '0');
     const s = String(sec).padStart(2, '0');
     time.textContent = `${h}:${m}:${s}`;
-    rtime = Number(currentTime);
             }
     });
     }
-    
-            
-
 
             console.log(rotate)
             //**画面回転の可否を確認 */
-          if(rotate=="true"){
-            document.getElementById('switch1').checked=true;
-                center.style.cursor="not-allowed";
-            }else if(!rotate){
-                document.getElementById('switch1').checked=true;
-                center.style.cursor="not-allowed";
-            }else if(rotate=="false"){
-                center.setAttribute('onclick','start()');
-                center.style.cursor="pointer";
-            }
-    
             if (navigator.userAgent.match(/iPhone|Android.+Mobile/)) {
                 if(rotate=="true"){
                 window.addEventListener("orientationchange", function() {
@@ -112,7 +92,7 @@ var firebaseConfig = {
       }
     
     
-
+    
             function routate(){
                 //**画面回転時スタート、ストップ動作 */
             var check = document.getElementById('switch1').checked;
@@ -143,17 +123,31 @@ var firebaseConfig = {
                     //**最終の更新が今日であるかの確認を行い、最終更新が今日以前であった場合、タイマーをリセットする */
                     retimer();
                 }
-                rtime = Number(udata.status.time);
+                holdTime = Number(udata.status.time)*1000;
+                RDB_STATUS_NOW = new Date();
+                RDB_STATUS_RECORD = new Date();
         db.ref('users/'+auth.currentUser.uid+'/status').update({
-            "time":rtime,
-            "now":new Date(),
-            "record":new Date()
+            "now":RDB_STATUS_NOW,
+            "record":RDB_STATUS_RECORD
         });
-      displayTime();
+        // 開始時間を現在の時刻に設定
+        startTime = Date.now();
+    
+        // 時間計測
+        displayTime();
+    
             }
     
             
             function stop(){
+                // タイマー停止
+                clearInterval(timer);
+            
+                // 停止時間を保持
+                holdTime += Date.now() - startTime;
+        
+                RDB_STATUS_TIME = Math.floor(holdTime/1000);
+                RDB_ARCHIVE_TIME = holdTime/1000/60;
                 //**ストップ動作。 カウントアップを停止し、DBに記録*/
             var check = document.getElementById('switch1').checked;
                 document.body.style.backgroundColor="lightgreen";
@@ -167,46 +161,42 @@ var firebaseConfig = {
                 if(!check){
                     center.setAttribute('onclick','start()');
                 }
-                clearTimeout(timeoutID);
-                db.ref('users/'+auth.currentUser.uid+'/status').update({
-                  "now":"stop",
-                  "time": rtime,
-                  "record":new Date()
-              });
-              var ago = new Date();
-              ago.setHours(ago.getHours() -Number(resettime));
-              var dt = new Date(ago);
-              var y = dt.getFullYear();
-            var m = ('00' + (dt.getMonth()+1)).slice(-2);
-            var d = ('00' + dt.getDate()).slice(-2);
-            var forma = y + '-' + m + '-' + d;
-            if(forma=='NaN-aN-aN'){
-            }else{
+                
+      db.ref('users/'+auth.currentUser.uid+'/status').update({
+        "now":"stop",
+        "time": RDB_STATUS_TIME,
+        "record":new Date()
+    });
+    var ago = new Date();
+    ago.setHours(ago.getHours() -Number(resettime));
+    var dt = new Date(ago);
+    var y = dt.getFullYear();
+  var m = ('00' + (dt.getMonth()+1)).slice(-2);
+  var d = ('00' + dt.getDate()).slice(-2);
+  var forma = y + '-' + m + '-' + d;
+  if(forma=='NaN-aN-aN'){
+  }else{
                 //**DB記録 */
-              db.ref('archive/'+forma+'/'+auth.currentUser.uid).update({
-                  "name":auth.currentUser.displayName,
-                  "time":Number(rtime)/60
-              })
-          }
+    db.ref('archive/'+forma+'/'+auth.currentUser.uid).update({
+        "name":auth.currentUser.displayName,
+        "time":RDB_ARCHIVE_TIME
+    })
+}
             }
     
     
-            const time = document.getElementById('time');
-            
     
     
     // カウントアップ
     function displayTime() {
-      var currentTime = rtime;
-      const hour = Math.floor(currentTime/3600);
-      const min = Math.floor((currentTime-3600*hour)/60);
-      const sec = currentTime-3600*hour-min*60;
-      const h = String(hour).padStart(2, '0');
-      const m = String(min).padStart(2, '0');
-      const s = String(sec).padStart(2, '0');
-      rtime=rtime+1;
-      time.textContent = `${h}:${m}:${s}`;
-      timeoutID = setTimeout(displayTime, 1000);
+        // タイマーを設定
+        timer = setTimeout(function () {
+            // 経過時間を設定し、画面へ表示
+            elapsedTime = Date.now() - startTime + holdTime;
+            showTime.textContent = new Date(elapsedTime).toISOString().slice(11, 19);
+            // 関数を呼び出し、時間計測を継続する
+            displayTime();
+        }, 1000);
     }
     
 
@@ -223,6 +213,7 @@ var firebaseConfig = {
 
     function retimer(){
         //**タイマーのリセット */
+        elapsedTime = 0;
       time.textContent = '00:00:00';
       stopTime = 0;
       var date = new Date(udata.status.record);
@@ -246,7 +237,7 @@ var firebaseConfig = {
       "record":new Date()
   });
   db.ref('archive/'+week).remove();
-
+  //**今日の日付に0を挿入することを追加する！！ */
     }
     
     function checkdate(){
@@ -267,16 +258,12 @@ var firebaseConfig = {
     }
     
     }
-
+    
     function comparison(){
         //**比較ページ読み込み */
-        if(rtime == udata.status.time){
-            location.href="./comparison.html"
-        }else{
-            if(!rtime){
+            if(!udata.status.time){
                 alert('一度スタートしてから押してください');
             }else{
-                alert('もう一度押してください');
+                location.href="./comparison.html"
             }
-        }
     }
