@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <script src="https://www.gstatic.com/firebasejs/ui/4.8.0/firebase-ui-auth.js"></script>
+  <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/4.8.0/firebase-ui-auth.css"/>
+    <meta charset="UTF-8">
+    <title>Gakkan-var.2</title>
+    <link rel="manifest" href="manifest.json">
+    <!-- The core FireBase JS SDK is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.5.0/firebase-auth.js"></script>
+ 
+    <!-- TODO: Add SDKs for FireBase products that you want to use
+         https://firebase.google.com/docs/web/setup#available-libraries -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.2/firebase-analytics.js"></script>
+ 
+    <script>
+        // Your web app's FireBase configuration
+        // For FireBase JS SDK v7.20.0 and later, measurementId is optional
+        var firebaseConfig = {
+        
+            apiKey: "AIzaSyDZG5TL_cjWvPHl-Z50WYi5pavCeweShzo",
+    authDomain: "gakusyuzikan-589f0.firebaseapp.com",
+    projectId: "gakusyuzikan-589f0",
+    storageBucket: "gakusyuzikan-589f0.appspot.com",
+    messagingSenderId: "882074972938",
+    appId: "1:882074972938:web:fd4623cc92988441f180f3",
+    measurementId: "G-QKV0M02F87"
+        
+        };
+        // Initialize FireBase
+        firebase.initializeApp(firebaseConfig);
+        firebase.analytics();
+        let uiConfig = {
+            callbacks: {
+                signInSuccessWithAuthResult: function(authResult, redirectUrl) {
+                    console.log(authResult.user.uid);
+                    console.log(authResult.user.displayName);
+                  return true;
+                },
+            },
+            signInFlow: 'popup',
+              signInSuccessUrl: './learning.html',
+            signInOptions: [
+                firebase.auth.EmailAuthProvider.PROVIDER_ID,
+            ],
+        };
+ 
+        let ui = new firebaseui.auth.AuthUI(firebase.auth());
+        ui.start('#firebaseui-auth-container', uiConfig);
+    </script> 
+    <style>
+        #header{
+            margin-top: -10px;
+            margin-left: -10px;
+            width: 100%;
+            height: 45px;
+            padding: 15px;
+            background-color: burlywood;
+            display:flex;
+        }
+        #header p{
+            font-size: large;
+            margin-top: 5px;
+            margin-left: 10px;
+        }
+        #firebaseui-auth-container{
+            width:400px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+    -webkit-transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+        }
+    </style>
+</head>
+<body>
+    <div id="header"><img src="./time.png" width="40px" height="40px"><p>Gakkan-var.2</p></div>
+    <p>ログイン、又は新規登録をしてください(名前は共有時に表示されます)</p>
+  <div id="firebaseui-auth-container"></div>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').then(function(registration) {
+        // 登録成功
+        console.log('ServiceWorker の登録に成功しました。スコープ: ', registration.scope);
+      }).catch(function(err) {
+        // 登録失敗
+        console.log('ServiceWorker の登録に失敗しました。', err);
+      });
+    }
+    </script>
+</body>
+<script src="https://www.gstatic.com/firebasejs/5.7.0/firebase.js"></script>
+</html>

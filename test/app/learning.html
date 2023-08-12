@@ -1,1 +1,52 @@
-aaa
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@300&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300&family=Zen+Maru+Gothic:wght@300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./learning.css">
+<link rel="icon" href="./gakkanicon.png" />
+    <title>Gakkan-var.2.1 Beta</title>
+    <link rel="manifest" href="manifest.json">
+    <script src="https://www.gstatic.com/firebasejs/8.6.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.5.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.7.0/firebase.js"></script>
+</head>
+<body>
+    <div id="back" onclick="location.href='./setting.html'"><div class="bcp">設定</div></div>
+    <div id="outer">
+        <div id="inner">
+            <div id="center">
+                <h1 id="status">休憩中</h1>
+                <h1 id="time">00:00:00</h1>
+            </div>
+        </div>
+        <div id="changebutton" onclick="comparison()">比較</div>
+    </div>
+    <!-- 実行中ウインドウのエリア -->
+<div id="runArea" class="runBg">
+    <div class="runWindow"> <!-- ここがウインドウとなります -->
+      <p>読み込み中</p>
+      <div class="bar"></div>
+    </div>
+  </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="./config.js"></script>
+    <script src="./learning.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.register('sw.js').then(function(registration) {
+            // 登録成功
+            console.log('Registering serviceworker was succeed. scope: ', registration.scope);
+          }).catch(function(err) {
+            // 登録失敗
+            console.log('Registering serviceworker was faild. ', err);
+          });
+        }
+        </script>
+</body>
+</html>
