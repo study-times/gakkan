@@ -221,7 +221,7 @@
             "time": stopTime,
             "record":new Date()
         });
-        var del_days = [];
+        var week_days = [];
         db.ref('archive').once('value', function (obj) {
             var str = Object.keys(obj.val());
             var weekago = new Date();
@@ -231,12 +231,22 @@
             for(let i=0;i<str.length;i++){
                 let day = new Date(str[i]).getTime();
                 if(day < week){
-                    del_days.push(str[i]);
+                    db.ref('archive/'+str[i]).remove();
+                }else{
+                    week_days.push(str[i]);
                 }
             }
-            console.log(del_days);
-            for(let j=0;j<del_days.length;j++){
-                db.ref('archive/'+del_days[j]).remove();
+            for(let j=0;j<7;j++){
+                let ago = new Date();
+                ago.setDate(ago.getDate() - j);
+                ago = format(new Date(ago));
+                var check = week_days.indexOf(ago);
+                if(check<0){
+                    db.ref('archive/'+ago+'/'+auth.currentUser.uid).update({
+                        "name":auth.currentUser.displayName,
+                        "time":0,
+                    });
+                }
             }
         });
     }
