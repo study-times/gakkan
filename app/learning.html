@@ -10,7 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300&family=Zen+Maru+Gothic:wght@300&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./learning.css">
 <link rel="icon" href="./gakkanicon.png" />
-    <title>Gakkan-var.2</title>
+    <title>Gakkan-var.2.1 Beta</title>
     <link rel="manifest" href="manifest.json">
     <script src="https://www.gstatic.com/firebasejs/8.6.2/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.5.0/firebase-auth.js"></script>
@@ -19,14 +19,6 @@
 <body>
     <div id="back" onclick="location.href='./setting.html'"><div class="bcp">設定</div></div>
     <div id="outer">
-        <div id="tggle">
-        <p>画面回転</p>
-        <div class="switchArea">
-            <input type="checkbox" id="switch1" onchange="routate()">
-            <label for="switch1"><span></span></label>
-            <div id="swImg"></div>
-          </div>
-        </div>
         <div id="inner">
             <div id="center">
                 <h1 id="status">休憩中</h1>
@@ -49,10 +41,10 @@
         if ('serviceWorker' in navigator) {
           navigator.serviceWorker.register('sw.js').then(function(registration) {
             // 登録成功
-            console.log('ServiceWorker の登録に成功しました。スコープ: ', registration.scope);
+            console.log('Registering serviceworker was succeed. scope: ', registration.scope);
           }).catch(function(err) {
             // 登録失敗
-            console.log('ServiceWorker の登録に失敗しました。', err);
+            console.log('Registering serviceworker was faild. ', err);
           });
         }
         </script>
