@@ -25,25 +25,6 @@
     var RDB_ARCHIVE_TIME;//RDBアーカイブ用記録時間
     
 
-
-
-    //**画面回転の可否を確認 */
-    if (navigator.userAgent.match(/iPhone|Android.+Mobile/)) {
-        angle = screen.orientation.angle;
-    if ( angle === undefined ) {
-        angle = window.orientation;    // iOS用
-    }
-    window.addEventListener("orientationchange", function() {   
-            console.log(count);
-            if(!count){ 
-                console.log(angle);
-                if (angle != 0) {
-                    start(true);
-                }
-            }
-        });
-    } 
-
     //**Firebaseのリセットを行ってからユーザーを取得 */
     var unsubscribe = firebase.auth().onAuthStateChanged((user) => {
         if (user) {
@@ -86,12 +67,28 @@
                 time.textContent = `${h}:${m}:${s}`;
             }
         });
+        //**画面回転の可否を確認 */
+        if (navigator.userAgent.match(/iPhone|Android.+Mobile/)) {
+        window.addEventListener("orientationchange", function() {   
+                console.log(count);
+                if(!count){ 
+                    angle = screen.orientation.angle;
+                    if ( angle === undefined ) {
+                        angle = window.orientation;    // iOS用
+                    }
+                    console.log(angle);
+                    if (angle === 0) {
+                    }else{
+                        start(true);
+                    }
+                }
+            });
+        } 
     }
 
     
     
     function start(rotate){
-        alert(rotate);
         /**スタート動作。カウントアップスタート、DB更新 */
         count = true;
         console.log(rotate);
@@ -103,15 +100,25 @@
             retimer();
         }
         if(rotate){	
-            center.setAttribute('onclick','');
-            window.addEventListener("orientationchange", function() {    
+            center.setAttribute('onclick','console.log("clicked")');
+            window.addEventListener("orientationchange", function() {  
+                angle = screen.orientation.angle;
+                if ( angle === undefined ) {
+                    angle = window.orientation;    // iOS用
+                }  
                 if (angle === 0) {
                     stop();
-                }else{console.log("changed angle")}
+                }else{
+                    console.log(angle);
+                }
             });
         }else{ 
             window.addEventListener("orientationchange", function() {
-                console.log(angle)
+                angle = screen.orientation.angle;
+                if ( angle === undefined ) {
+                    angle = window.orientation;    // iOS用
+                }
+                console.log(angle);
                 if (angle === 0) {
                     console.log("changed angle");
                 }else{
@@ -144,13 +151,22 @@
         document.getElementById('status').innerText='休憩中';
         document.getElementById('changebutton').style.display="block";
         setting.style.display="block";        
-        if (navigator.userAgent.match(/iPhone|Android.+Mobile/)) {//**スタート方法をリセット */
-            window.addEventListener("orientationchange", function() {
-                if (angle != 0) {
-                    start(true);
+        if (navigator.userAgent.match(/iPhone|Android.+Mobile/)) {
+            window.addEventListener("orientationchange", function() {   
+                console.log(count);
+                if(!count){ 
+                    angle = screen.orientation.angle;
+                    if ( angle === undefined ) {
+                        angle = window.orientation;    // iOS用
+                    }
+                    console.log(angle);
+                    if (angle === 0) {
+                    }else{
+                        start(true);
+                    }
                 }
             });
-        } 
+        }
         center.setAttribute('onclick','start(false)');
         center.style.cursor="pointer";
         db.ref('users/'+auth.currentUser.uid+'/status').update({
