@@ -208,10 +208,6 @@
         var date = new Date(udata.status.record);
         var day = format(date);
         console.log(day);
-        var weekago = new Date();
-        weekago.setDate(weekago.getDate() - 7);
-        var week = format(new Date(weekago));
-        console.log(week);
         var minuite = Number(udata.status.time)/60;
         if(day=='NaN-aN-aN'){
         }else{
@@ -225,8 +221,24 @@
             "time": stopTime,
             "record":new Date()
         });
-        db.ref('archive/'+week).remove();
-        //**archiveの全てのkeyを取り出し、1週間以上前のデータを全て消去 */
+        var del_days = [];
+        db.ref('archive').once('value', function (obj) {
+            var str = Object.keys(obj.val());
+            var weekago = new Date();
+            weekago.setDate(weekago.getDate() - 7);
+            var week = new Date(weekago).getTime();
+            console.log(str);
+            for(let i=0;i<str.length;i++){
+                let day = new Date(str[i]).getTime();
+                if(day < week){
+                    del_days.push(str[i]);
+                }
+            }
+            console.log(del_days);
+            for(let j=0;j<del_days.length;j++){
+                db.ref('archive/'+del_days[j]).remove();
+            }
+        });
     }
     
     function checkdate(){//**最終更新が今日であることの確認 */
