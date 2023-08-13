@@ -12,7 +12,6 @@
     var count=false;
     var setting = document.getElementById('back');
     var center = document.getElementById('center');
-    center.setAttribute('onclick','start(false)');
     center.style.cursor="pointer";
     const showTime = document.getElementById('time');
 
@@ -69,8 +68,13 @@
         });
         //**画面回転の可否を確認 */
         if (navigator.userAgent.match(/iPhone|Android.+Mobile/)) {
-        window.addEventListener("orientationchange", function() {   
-                console.log(count);
+        window.addEventListener("orientationchange", rotatestater);
+        } 
+        center.setAttribute('onclick','start(false)');
+    }
+
+    function rotatestater(){
+        console.log(count);
                 if(!count){ 
                     angle = screen.orientation.angle;
                     if ( angle === undefined ) {
@@ -82,11 +86,20 @@
                         start(true);
                     }
                 }
-            });
-        } 
     }
 
-    
+    function rotatestopper(){
+        angle = screen.orientation.angle;
+        if ( angle === undefined ) {
+            angle = window.orientation;    // iOS用
+        }  
+        if (angle === 0) {
+            stop();
+        }else{
+            console.log(angle);
+        }
+    }
+
     
     function start(rotate){
         /**スタート動作。カウントアップスタート、DB更新 */
@@ -99,32 +112,11 @@
         if(!checkdate()){//**最終の更新が今日であるかの確認を行い、最終更新が今日以前であった場合、タイマーをリセットする */
             retimer();
         }
+        window.removeEventListener("orientationchange", rotatestater);
         if(rotate){	
             center.setAttribute('onclick','console.log("clicked")');
-            window.addEventListener("orientationchange", function() {  
-                angle = screen.orientation.angle;
-                if ( angle === undefined ) {
-                    angle = window.orientation;    // iOS用
-                }  
-                if (angle === 0) {
-                    stop();
-                }else{
-                    console.log(angle);
-                }
-            });
-        }else{ 
-            window.addEventListener("orientationchange", function() {
-                angle = screen.orientation.angle;
-                if ( angle === undefined ) {
-                    angle = window.orientation;    // iOS用
-                }
-                console.log(angle);
-                if (angle === 0) {
-                    console.log("changed angle");
-                }else{
-                    console.log("changed angle");
-                }
-            });
+            window.addEventListener("orientationchange", rotatestopper);
+        }else{
             center.setAttribute('onclick','stop()');
         }
         holdTime = Number(udata.status.time)*1000;
@@ -150,22 +142,13 @@
         document.body.style.backgroundColor="lightgreen";
         document.getElementById('status').innerText='休憩中';
         document.getElementById('changebutton').style.display="block";
-        setting.style.display="block";        
+        setting.style.display="block";   
         if (navigator.userAgent.match(/iPhone|Android.+Mobile/)) {
-            window.addEventListener("orientationchange", function() {   
-                console.log(count);
-                if(!count){ 
-                    angle = screen.orientation.angle;
-                    if ( angle === undefined ) {
-                        angle = window.orientation;    // iOS用
-                    }
-                    console.log(angle);
-                    if (angle === 0) {
-                    }else{
-                        start(true);
-                    }
-                }
-            });
+            window.removeEventListener("orientationchange", rotatestopper);
+        }
+        center.setAttribute('onclick','');
+        if (navigator.userAgent.match(/iPhone|Android.+Mobile/)) {
+            window.addEventListener("orientationchange", rotatestater);
         }
         center.setAttribute('onclick','start(false)');
         center.style.cursor="pointer";
