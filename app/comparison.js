@@ -173,6 +173,9 @@
                   borderWidth: 1,
                 }]
               },
+              options: {
+                maintainAspectRatio: false
+              },
             };
             let barChart = new Chart(barCtx, barConfig);
         }
@@ -191,6 +194,9 @@
                   borderColor: '#f88',
                 }],
               },
+              options: {
+                maintainAspectRatio: false
+              },
             };
             let lineChart = new Chart(lineCtx, lineConfig);
         }
@@ -208,6 +214,9 @@
                   backgroundColor:colors,
                   borderWidth: 1,
                 }]
+              },
+              options: {
+                maintainAspectRatio: false
               },
             };
             let barChart = new Chart(barCtx, barConfig);
