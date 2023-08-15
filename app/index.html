@@ -4,7 +4,8 @@
   <script src="https://www.gstatic.com/firebasejs/ui/4.8.0/firebase-ui-auth.js"></script>
   <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/4.8.0/firebase-ui-auth.css"/>
     <meta charset="UTF-8">
-    <title>Gakkan-var.2</title>
+    <title>Gakkan</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
     <link rel="manifest" href="manifest.json">
     <!-- The core FireBase JS SDK is always required and must be listed first -->
     <script src="https://www.gstatic.com/firebasejs/8.6.2/firebase-app.js"></script>
@@ -64,19 +65,17 @@
             margin-top: 5px;
             margin-left: 10px;
         }
-        #firebaseui-auth-container{
-            width:400px;
+          #firebaseui-auth-container{
+            width:90%;
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-    -webkit-transform: translate(-50%, -50%);
-    -ms-transform: translate(-50%, -50%);
         }
     </style>
 </head>
 <body>
-    <div id="header"><img src="./time.png" width="40px" height="40px"><p>Gakkan-var.2</p></div>
+    <div id="header"><img src="./time.png" width="40px" height="40px"><p>Gakkan</p></div>
     <p>ログイン、又は新規登録をしてください(名前は共有時に表示されます)</p>
   <div id="firebaseui-auth-container"></div>
   <script>
