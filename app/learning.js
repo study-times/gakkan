@@ -40,8 +40,7 @@
     /**-------------------------------
     * ----------FirebaseRDBから初期値を取得 */
     function index(){
-        document.getElementById("runArea").remove();
-        db.ref('users/'+auth.currentUser.uid).on('value', function (obj) {
+        db.ref('users/'+auth.currentUser.uid).once('value',function (obj){
             if(!obj.val()){
                 console.log("no obj")
                 db.ref('users/'+auth.currentUser.uid).update({
@@ -54,6 +53,40 @@
                     }
                 });
             }else{
+            udata = obj.val();
+            RDB_STATUS_NOW=udata.status.now;
+            console.log('now='+RDB_STATUS_NOW);
+            if(RDB_STATUS_NOW != "stop"&& count == false){
+                var sTime = new Date(RDB_STATUS_NOW).getTime();//**停止操作を記述する。 */
+                resettime=udata.reset;
+                console.log(sTime);
+                holdTime = udata.status.time+Math.floor((Date.now() - sTime)/1000);
+                console.log(holdTime);
+                RDB_STATUS_TIME = holdTime;
+                RDB_ARCHIVE_TIME = holdTime/60;
+                db.ref('users/'+auth.currentUser.uid+'/status').update({
+                    "now":"stop",
+                    "time": RDB_STATUS_TIME,
+                    "record":new Date()
+                });
+                var ago = new Date();
+                ago.setHours(ago.getHours() -Number(resettime));
+                var dt = new Date(ago);
+                var y = dt.getFullYear();
+                var m = ('00' + (dt.getMonth()+1)).slice(-2);
+                var d = ('00' + dt.getDate()).slice(-2);
+                var forma = y + '-' + m + '-' + d;
+                if(forma=='NaN-aN-aN'){
+                }else{//**DB記録 */
+                    db.ref('archive/'+forma+'/'+auth.currentUser.uid).update({
+                        "name":auth.currentUser.displayName,
+                        "time":RDB_ARCHIVE_TIME
+                    })
+                }
+            }
+        }
+        });
+        db.ref('users/'+auth.currentUser.uid).on('value', function (obj) {
                 udata=obj.val();
                 resettime=udata.reset;
                 var currentTime = udata.status.time;
@@ -64,8 +97,8 @@
                 const m = String(min).padStart(2, '0');
                 const s = String(sec).padStart(2, '0');
                 time.textContent = `${h}:${m}:${s}`;
-            }
         });
+        document.getElementById("runArea").remove();
         //**画面回転の可否を確認 */
         if (navigator.userAgent.match(/iPhone|Android.+Mobile/)) {
         window.addEventListener("orientationchange", rotatestater);
