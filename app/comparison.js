@@ -74,8 +74,16 @@
             var keys =Object.keys(todaydata);
             for(i=0;i<keys.length;i++){
                 var array=[];
+                var times;
                 array.push(todaydata[keys[i]].name);
-                array.push(todaydata[keys[i]].time);
+                if(todaydata[keys[i]].status != "stop"){
+                  var sTime = new Date(todaydata[keys[i]].status).getTime();
+                  times = Math.floor(Number(todaydata[keys[i]].time)+(Date.now() - sTime)/1000/60);
+                  console.log(sTime);
+                }else{
+                  times = Math.floor(todaydata[keys[i]].time);
+                }
+                array.push(times);
                 racedata.push(array);
             }
             racedata.sort(function(a, b) {

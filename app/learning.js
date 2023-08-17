@@ -80,7 +80,8 @@
                 }else{//**DB記録 */
                     db.ref('archive/'+forma+'/'+auth.currentUser.uid).update({
                         "name":auth.currentUser.displayName,
-                        "time":RDB_ARCHIVE_TIME
+                        "time":RDB_ARCHIVE_TIME,
+                        "status":"stop"
                     })
                 }
             }
@@ -159,6 +160,19 @@
             "now":RDB_STATUS_NOW,
             "record":RDB_STATUS_RECORD
         });
+        var ago = new Date();
+        ago.setHours(ago.getHours() -Number(resettime));
+        var dt = new Date(ago);
+        var y = dt.getFullYear();
+        var m = ('00' + (dt.getMonth()+1)).slice(-2);
+        var d = ('00' + dt.getDate()).slice(-2);
+        var forma = y + '-' + m + '-' + d;
+        if(forma=='NaN-aN-aN'){
+        }else{//**DB記録 */
+            db.ref('archive/'+forma+'/'+auth.currentUser.uid).update({
+                "status":RDB_STATUS_NOW
+            })
+        }
         startTime = Date.now();// 開始時間を現在の時刻に設定
         displayTime();// 時間計測
     }
@@ -201,7 +215,8 @@
         }else{//**DB記録 */
             db.ref('archive/'+forma+'/'+auth.currentUser.uid).update({
                 "name":auth.currentUser.displayName,
-                "time":RDB_ARCHIVE_TIME
+                "time":RDB_ARCHIVE_TIME,
+                "status":"stop"
             })
         }
     }
