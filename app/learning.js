@@ -42,7 +42,6 @@
     function index(){
         db.ref('users/'+auth.currentUser.uid).once('value',function (obj){
             if(!obj.val()){
-                console.log("no obj")
                 db.ref('users/'+auth.currentUser.uid).update({
                     "name": auth.currentUser.displayName,
                     "reset":4,
@@ -55,13 +54,10 @@
             }else{
             udata = obj.val();
             RDB_STATUS_NOW=udata.status.now;
-            console.log('now='+RDB_STATUS_NOW);
             if(RDB_STATUS_NOW != "stop"&& count == false){
                 var sTime = new Date(RDB_STATUS_NOW).getTime();//**停止操作を記述する。 */
                 resettime=udata.reset;
-                console.log(sTime);
                 holdTime = udata.status.time+Math.floor((Date.now() - sTime)/1000);
-                console.log(holdTime);
                 RDB_STATUS_TIME = holdTime;
                 RDB_ARCHIVE_TIME = holdTime/60;
                 db.ref('users/'+auth.currentUser.uid+'/status').update({
@@ -108,13 +104,11 @@
     }
 
     function rotatestater(){
-        console.log(count);
                 if(!count){ 
                     angle = screen.orientation.angle;
                     if ( angle === undefined ) {
                         angle = window.orientation;    // iOS用
                     }
-                    console.log(angle);
                     if (angle === 0) {
                     }else{
                         start(true);
@@ -130,7 +124,6 @@
         if (angle === 0) {
             stop();
         }else{
-            console.log(angle);
         }
     }
 
@@ -138,7 +131,6 @@
     function start(rotate){
         /**スタート動作。カウントアップスタート、DB更新 */
         count = true;
-        console.log(rotate);
         document.body.style.backgroundColor='#Ffa07a';
         document.getElementById('status').innerText='学習中';
         document.getElementById('changebutton').style.display="none";
@@ -148,7 +140,6 @@
         }
         window.removeEventListener("orientationchange", rotatestater);
         if(rotate){	
-            center.setAttribute('onclick','console.log("clicked")');
             window.addEventListener("orientationchange", rotatestopper);
         }else{
             center.setAttribute('onclick','stop()');
@@ -255,7 +246,6 @@
         stopTime = 0;
         var date = new Date(udata.status.record);
         var day = format(date);
-        console.log(day);
         var minuite = Number(udata.status.time)/60;
         if(day=='NaN-aN-aN'){
         }else{
@@ -275,7 +265,6 @@
             var weekago = new Date();
             weekago.setDate(weekago.getDate() - 7);
             var week = new Date(weekago).getTime();
-            console.log(str);
             for(let i=0;i<str.length;i++){
                 let day = new Date(str[i]).getTime();
                 if(day < week){
@@ -305,20 +294,16 @@
         var ago = new Date();
         ago.setHours(ago.getHours() - Number(resettime));
         rec.setHours(rec.getHours() - Number(resettime));
-        console.log("now time -"+resettime+" hour="+ago);
-        console.log("recorded time -"+resettime+" hour="+rec);
         if(new Date(ago).getDate() == new Date(rec).getDate()){
-            console.log('true');
           return true;
         }else{
-            console.log('false');
           return false;
         }
     }
     
     function comparison(){//**比較ページ読み込み */
         if(!udata.status.time){
-            alert('一度スタートしてから押してください');
+            alert('一度スタートしてから押してください');//**なかったら作って読み込み。  */
         }else{
             location.href="./comparison.html"
         }

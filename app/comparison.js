@@ -40,7 +40,6 @@
         })
             db.ref('archive').on('value', function (obj) {
                 data = obj.val();
-                console.log(obj.val());
                 racelabel=[];
                 racetimes=[];
                 racedata=[];
@@ -79,7 +78,6 @@
                 if(todaydata[keys[i]].status != "stop"){
                   var sTime = new Date(todaydata[keys[i]].status).getTime();
                   times = Math.floor(Number(todaydata[keys[i]].time)+(Date.now() - sTime)/1000/60);
-                  console.log(sTime);
                 }else{
                   times = Math.floor(todaydata[keys[i]].time);
                 }
@@ -89,7 +87,6 @@
             racedata.sort(function(a, b) {
                 return b[1] - a[1];
             });
-            console.log(racedata);
             var name = auth.currentUser.displayName;
             for(i=0;i<keys.length;i++){
                 racelabel.push(racedata[i][0]);
@@ -118,7 +115,6 @@
                     array.push(keys[i]);
                     owndata.push(array);
                 }
-                console.log(owndata);
                 owndata.sort(function(a, b) {
                 return b[1] - a[1];
                 });
@@ -136,7 +132,6 @@
             day = new Date(today);
             day.setDate(day.getDate() - 1);
             var yesterday = format(new Date(day));
-            console.log(yesterday);
             var yesterdaydata = data[yesterday];
             if(!yesterdaydata){
                 document.getElementById('nodata').innerHTML="データがありませんでした";
@@ -151,7 +146,6 @@
             yesdata.sort(function(a, b) {
                 return b[1] - a[1];
             });
-            console.log(yesdata);
             var name = auth.currentUser.displayName;
             for(i=0;i<keys.length;i++){
                 yeslabel.push(yesdata[i][0]);

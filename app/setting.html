@@ -69,10 +69,10 @@ firebase.initializeApp(firebaseConfig);
 var db=firebase.database();
 const auth = firebase.auth();
 let time = document.getElementById('time');
-    setTimeout(() => {
+    function index(){
 time.addEventListener('change', inputChange);
 document.getElementById('username').value=auth.currentUser.displayName;
-}, 1000);
+}
 function inputChange(event){
     db.ref('users/'+auth.currentUser.uid).update({
             "reset":event.currentTarget.value,
@@ -80,7 +80,6 @@ function inputChange(event){
     setTimeout(() => {
         alert('変更されました');
 }, 500);
-    console.log(event.currentTarget.value);
 }
 
 function format(dt){
@@ -115,11 +114,9 @@ function rename(){
 
 function logout(){
         firebase.auth().signOut().then(()=>{
-            console.log("ログアウトしました");
             location.href="./index.html";
           })
           .catch( (error)=>{
-            console.log(`ログアウト時にエラーが発生しました (${error})`);
           });
     }
     
